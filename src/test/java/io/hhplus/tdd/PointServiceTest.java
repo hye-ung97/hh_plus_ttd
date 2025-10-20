@@ -31,45 +31,49 @@ public class PointServiceTest {
     @InjectMocks
     private PointService pointService;
 
+    private static final long USER_ID = 1L;
+
+    private UserPoint createUserPoint(long userId, long point) {
+        return new UserPoint(userId, point, System.currentTimeMillis());
+    }
+
     @Test
     @DisplayName("포인트 조회 성공")
     void getPoint_success() {
         // given
-        long userId = 1L;
         long point = 100L;
-        UserPoint userPoint = new UserPoint(userId, point, System.currentTimeMillis());
-        when(userPointTable.selectById(userId)).thenReturn(userPoint);
+        UserPoint userPoint = createUserPoint(USER_ID, point);
+        when(userPointTable.selectById(USER_ID)).thenReturn(userPoint);
 
         // when
-        UserPoint result = pointService.getPointById(userId);
+        UserPoint result = pointService.getPointById(USER_ID);
 
         // then
         assertThat(result).isEqualTo(userPoint);
-        verify(userPointTable, times(1)).selectById(userId);
+        verify(userPointTable, times(1)).selectById(USER_ID);
     }
 
     @Test
     @DisplayName("포인트 충전 성공")
     void charge_success() {
         // given
-        long userId = 1L;
         long initialPoint = 100L;
         long chargeAmount = 100L;
         long expectedPoint = initialPoint + chargeAmount;
         
-        UserPoint currentPoint = new UserPoint(userId, initialPoint, System.currentTimeMillis());
-        UserPoint updatedPoint = new UserPoint(userId, expectedPoint, System.currentTimeMillis());
+        UserPoint currentPoint = createUserPoint(USER_ID, initialPoint);
+        UserPoint updatedPoint = createUserPoint(USER_ID, expectedPoint);
         
-        when(userPointTable.selectById(userId)).thenReturn(currentPoint);
-        when(userPointTable.insertOrUpdate(userId, expectedPoint)).thenReturn(updatedPoint);
+        when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
+        when(userPointTable.insertOrUpdate(USER_ID, expectedPoint)).thenReturn(updatedPoint);
 
         // when
-        UserPoint result = pointService.chargePoint(userId, chargeAmount);
+        UserPoint result = pointService.chargePoint(USER_ID, chargeAmount);
 
         // then
         assertThat(result.point()).isEqualTo(expectedPoint);
-        verify(userPointTable, times(1)).selectById(userId);
-        verify(userPointTable, times(1)).insertOrUpdate(userId, expectedPoint);
-        verify(pointHistoryTable, times(1)).insert(userId, chargeAmount, TransactionType.CHARGE, updatedPoint.updateMillis());
+        verify(userPointTable, times(1)).selectById(USER_ID);
+        verify(userPointTable, times(1)).insertOrUpdate(USER_ID, expectedPoint);
+        verify(pointHistoryTable, times(1)).insert(USER_ID, chargeAmount, TransactionType.CHARGE, updatedPoint.updateMillis());
     }
 }
