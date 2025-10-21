@@ -1,14 +1,23 @@
 package io.hhplus.tdd.point.exception;
 
-public abstract class PointException extends RuntimeException {
-    private final String errorCode;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
-    protected PointException(String errorCode, String message) {
-        super(message);
+@Getter
+public class PointException extends RuntimeException {
+    private final ErrorCode errorCode;
+
+    public PointException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 
-    public String getErrorCode() {
-        return errorCode;
+    public PointException(ErrorCode errorCode, String customMessage) {
+        super(customMessage);
+        this.errorCode = errorCode;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return errorCode.getCode();
     }
 }

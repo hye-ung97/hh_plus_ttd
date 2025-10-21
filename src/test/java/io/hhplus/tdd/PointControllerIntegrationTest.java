@@ -63,7 +63,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(String.valueOf(invalidAmount)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_002"))
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.message").exists());
     }
 
@@ -80,7 +80,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("2000"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_003"));
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -91,7 +91,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("0"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_002"));
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -102,7 +102,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("-100"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_002"));
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -156,7 +156,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("1000"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_001"));
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -172,7 +172,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("150"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_004"));
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -309,7 +309,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("20000"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_003"));
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()));
 
         mockMvc.perform(get("/point/{id}", USER_ID))
                 .andExpect(status().isOk())
@@ -335,7 +335,7 @@ class PointControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("500"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("POINT_001"));
+                .andExpect(jsonPath("$.code").value(HttpStatus.BAD_REQUEST.value()));
 
         mockMvc.perform(get("/point/{id}", USER_ID))
                 .andExpect(status().isOk())

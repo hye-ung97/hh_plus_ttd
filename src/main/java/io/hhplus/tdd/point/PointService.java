@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
-import io.hhplus.tdd.point.exception.InsufficientPointException;
-import io.hhplus.tdd.point.exception.InvalidChargeAmountException;
-import io.hhplus.tdd.point.exception.InvalidPointUnitException;
-import io.hhplus.tdd.point.exception.PointLimitExceededException;
+import io.hhplus.tdd.point.exception.ErrorCode;
+import io.hhplus.tdd.point.exception.PointException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,11 +31,11 @@ public class PointService {
         long newAmount = currentPoint.point() + amount;
         if (amount < MIN_CHARGE_AMOUNT) {
             log.error("포인트 충전 최소 금액 미만: userId={}, chargeAmount={}", userId, amount);
-            throw new InvalidChargeAmountException(amount);
+            throw new PointException(ErrorCode.INVALID_CHARGE_AMOUNT);
         }
         if (newAmount > MAX_POINT) {
             log.error("포인트 충전 한도 초과: userId={}, currentPoint={}, chargeAmount={}", userId, currentPoint.point(), amount);
-            throw new PointLimitExceededException(currentPoint.point(), amount, MAX_POINT);
+            throw new PointException(ErrorCode.POINT_LIMIT_EXCEEDED);
         }
 
         UserPoint updatedPoint = userPointTable.insertOrUpdate(userId, newAmount);
@@ -49,11 +47,11 @@ public class PointService {
         UserPoint currentPoint = userPointTable.selectById(userId);
         if (currentPoint.point() < amount) {
             log.error("포인트 부족: userId={}, currentPoint={}, useAmount={}", userId, currentPoint.point(), amount);
-            throw new InsufficientPointException(currentPoint.point(), amount);
+            throw new PointException(ErrorCode.INSUFFICIENT_POINT);
         }
         if (amount % POINT_UNIT != 0) {
             log.error("포인트 이용 금액 단위 오류: userId={}, useAmount={}", userId, amount);
-            throw new InvalidPointUnitException(amount);
+            throw new PointException(ErrorCode.INVALID_POINT_UNIT);
         }
         long newAmount = currentPoint.point() - amount;
         UserPoint updatedPoint = userPointTable.insertOrUpdate(userId, newAmount);
