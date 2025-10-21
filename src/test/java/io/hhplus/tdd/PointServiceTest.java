@@ -19,6 +19,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PointService 단위 테스트 - TDD")
 public class PointServiceTest {
@@ -102,5 +104,24 @@ public class PointServiceTest {
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(1)).insertOrUpdate(USER_ID, expectedPoint);
         verify(pointHistoryTable, times(1)).insert(USER_ID, useAmount, TransactionType.USE, updatedPoint.updateMillis());
+    }
+
+    @Test
+    @DisplayName("포인트 내역 조회 성공")
+    void getPointHistory_success(){
+        // given
+        List<PointHistory> expectedHistories = List.of(
+            new PointHistory(1L, USER_ID, 100L, TransactionType.CHARGE, System.currentTimeMillis()),
+            new PointHistory(2L, USER_ID, 50L, TransactionType.USE, System.currentTimeMillis())
+        );
+        
+        when(pointHistoryTable.selectAllByUserId(USER_ID)).thenReturn(expectedHistories);
+
+        // when
+        List<PointHistory> result = pointService.getPointHistory(USER_ID);
+
+        // then
+        assertThat(result).isEqualTo(expectedHistories);
+        verify(pointHistoryTable, times(1)).selectAllByUserId(USER_ID);
     }
 }
