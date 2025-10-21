@@ -6,6 +6,10 @@ import io.hhplus.tdd.point.PointHistory;
 import io.hhplus.tdd.point.PointService;
 import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.UserPoint;
+import io.hhplus.tdd.point.exception.InsufficientPointException;
+import io.hhplus.tdd.point.exception.InvalidChargeAmountException;
+import io.hhplus.tdd.point.exception.InvalidPointUnitException;
+import io.hhplus.tdd.point.exception.PointLimitExceededException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -92,7 +96,7 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThrows(InvalidChargeAmountException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -109,7 +113,7 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThrows(PointLimitExceededException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -149,7 +153,7 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThrows(InvalidChargeAmountException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -166,7 +170,7 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThrows(InvalidChargeAmountException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -232,8 +236,8 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> pointService.usePoint(USER_ID, useAmount));
-        
+        assertThrows(InsufficientPointException.class, () -> pointService.usePoint(USER_ID, useAmount));
+
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint - useAmount);
     }
@@ -249,8 +253,8 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> pointService.usePoint(USER_ID, useAmount));
-        
+        assertThrows(InvalidPointUnitException.class, () -> pointService.usePoint(USER_ID, useAmount));
+
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint - useAmount);
     }
