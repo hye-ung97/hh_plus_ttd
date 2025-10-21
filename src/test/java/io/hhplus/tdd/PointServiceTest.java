@@ -6,10 +6,8 @@ import io.hhplus.tdd.point.PointHistory;
 import io.hhplus.tdd.point.PointService;
 import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.UserPoint;
-import io.hhplus.tdd.point.exception.InsufficientPointException;
-import io.hhplus.tdd.point.exception.InvalidChargeAmountException;
-import io.hhplus.tdd.point.exception.InvalidPointUnitException;
-import io.hhplus.tdd.point.exception.PointLimitExceededException;
+import io.hhplus.tdd.point.exception.ErrorCode;
+import io.hhplus.tdd.point.exception.PointException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,7 +94,8 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(InvalidChargeAmountException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        PointException exception = assertThrows(PointException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_CHARGE_AMOUNT);
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -113,7 +112,8 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(PointLimitExceededException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        PointException exception = assertThrows(PointException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POINT_LIMIT_EXCEEDED);
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -153,7 +153,8 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(InvalidChargeAmountException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        PointException exception = assertThrows(PointException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_CHARGE_AMOUNT);
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -170,7 +171,8 @@ public class PointServiceTest {
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(InvalidChargeAmountException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        PointException exception = assertThrows(PointException.class, () -> pointService.chargePoint(USER_ID, chargeAmount));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_CHARGE_AMOUNT);
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint + chargeAmount);
@@ -231,12 +233,13 @@ public class PointServiceTest {
         // given
         long initialPoint = 100L;
         long useAmount = 150L; // 사용하려는 금액이 보유 포인트보다 많음
-        
+
         UserPoint currentPoint = createUserPoint(USER_ID, initialPoint);
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(InsufficientPointException.class, () -> pointService.usePoint(USER_ID, useAmount));
+        PointException exception = assertThrows(PointException.class, () -> pointService.usePoint(USER_ID, useAmount));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INSUFFICIENT_POINT);
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint - useAmount);
@@ -248,12 +251,13 @@ public class PointServiceTest {
         // given
         long initialPoint = 1000L;
         long useAmount = 150L; // 100원 단위가 아님
-        
+
         UserPoint currentPoint = createUserPoint(USER_ID, initialPoint);
         when(userPointTable.selectById(USER_ID)).thenReturn(currentPoint);
 
         // when & then
-        assertThrows(InvalidPointUnitException.class, () -> pointService.usePoint(USER_ID, useAmount));
+        PointException exception = assertThrows(PointException.class, () -> pointService.usePoint(USER_ID, useAmount));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_POINT_UNIT);
 
         verify(userPointTable, times(1)).selectById(USER_ID);
         verify(userPointTable, times(0)).insertOrUpdate(USER_ID, initialPoint - useAmount);
